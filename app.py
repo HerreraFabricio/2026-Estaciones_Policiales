@@ -104,6 +104,13 @@ st.markdown(
         color: #685b37;
     }
 
+    div.stButton > button {
+        width: 100%;
+        border-radius: 10px;
+        height: 45px;
+        font-weight: 700;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
@@ -120,6 +127,7 @@ def calcular_distancia(lat1, lon1, lat2, lon2):
 
     lat1 = math.radians(lat1)
     lon1 = math.radians(lon1)
+
     lat2 = math.radians(lat2)
     lon2 = math.radians(lon2)
 
@@ -148,7 +156,12 @@ def calcular_distancia(lat1, lon1, lat2, lon2):
 
 def obtener_estaciones(latitud, longitud):
 
-    url = "https://overpass.kumi.systems/api/interpreter"
+    # Se intenta con varios servidores.
+    # Si uno falla, automáticamente prueba el siguiente.
+    servidores = [
+        "https://overpass.private.coffee/api/interpreter",
+        "https://overpass-api.de/api/interpreter"
+    ]
 
     consulta = f"""
     [out:json][timeout:30];
@@ -167,62 +180,99 @@ def obtener_estaciones(latitud, longitud):
         "Accept": "application/json"
     }
 
-    respuesta = requests.post(
-        url,
-        data={"data": consulta},
-        headers=headers,
-        timeout=60
+    ultimo_error = None
+
+    for url in servidores:
+
+        try:
+
+            respuesta = requests.post(
+                url,
+                data={
+                    "data": consulta
+                },
+                headers=headers,
+                timeout=60
+            )
+
+            respuesta.raise_for_status()
+
+            datos = respuesta.json()
+
+            estaciones = []
+
+            for elemento in datos.get("elements", []):
+
+                tags = elemento.get(
+                    "tags",
+                    {}
+                )
+
+                nombre = tags.get(
+                    "name",
+                    "Estación Policial"
+                )
+
+                # Nodo
+                if elemento.get("type") == "node":
+
+                    lat = elemento.get("lat")
+                    lon = elemento.get("lon")
+
+                # Way o relation
+                else:
+
+                    centro = elemento.get(
+                        "center",
+                        {}
+                    )
+
+                    lat = centro.get("lat")
+                    lon = centro.get("lon")
+
+                if lat is None or lon is None:
+                    continue
+
+                distancia = calcular_distancia(
+                    latitud,
+                    longitud,
+                    lat,
+                    lon
+                )
+
+                estaciones.append({
+                    "nombre": nombre,
+                    "latitud": lat,
+                    "longitud": lon,
+                    "distancia": distancia
+                })
+
+            # Ordenar de menor a mayor distancia
+            estaciones.sort(
+                key=lambda estacion: estacion["distancia"]
+            )
+
+            return estaciones
+
+        except (
+            requests.exceptions.RequestException,
+            ValueError
+        ) as error:
+
+            ultimo_error = error
+
+            print(
+                f"Servidor no disponible: {url}"
+            )
+
+            print(
+                f"Error: {error}"
+            )
+
+    raise RuntimeError(
+        "No fue posible conectarse con los servidores "
+        f"de búsqueda. Último error: {ultimo_error}"
     )
-
-    respuesta.raise_for_status()
-
-    datos = respuesta.json()
-
-    estaciones = []
-
-    for elemento in datos.get("elements", []):
-
-        tags = elemento.get("tags", {})
-
-        nombre = tags.get(
-            "name",
-            "Estación Policial"
-        )
-
-        if elemento["type"] == "node":
-
-            lat = elemento.get("lat")
-            lon = elemento.get("lon")
-
-        else:
-
-            centro = elemento.get("center", {})
-
-            lat = centro.get("lat")
-            lon = centro.get("lon")
-
-        if lat is None or lon is None:
-            continue
-
-        distancia = calcular_distancia(
-            latitud,
-            longitud,
-            lat,
-            lon
-        )
-
-        estaciones.append({
-            "nombre": nombre,
-            "latitud": lat,
-            "longitud": lon,
-            "distancia": distancia
-        })
-
-    estaciones.sort(
-        key=lambda estacion: estacion["distancia"]
-    )
-
-    return estaciones
 
 
 # ---------------------------------------------------------
@@ -253,7 +303,9 @@ st.markdown(
 # OBTENER UBICACIÓN DEL DISPOSITIVO
 # ---------------------------------------------------------
 
-st.subheader("📍 Obtener mi ubicación")
+st.subheader(
+    "📍 Obtener mi ubicación"
+)
 
 st.write(
     "Presione el botón de ubicación y permita el acceso "
@@ -288,15 +340,28 @@ if (
     st.markdown(
         f"""
         <div class="ubicacion">
-            <strong>✅ Ubicación obtenida correctamente</strong>
+
+            <strong>
+                ✅ Ubicación obtenida correctamente
+            </strong>
+
             <br><br>
+
             Latitud: {latitud:.6f}
+
             <br>
+
             Longitud: {longitud:.6f}
+
         </div>
         """,
         unsafe_allow_html=True
     )
+
+
+    # -----------------------------------------------------
+    # MOSTRAR PRECISIÓN
+    # -----------------------------------------------------
 
     if precision is not None:
 
@@ -307,7 +372,7 @@ if (
 
 
     # -----------------------------------------------------
-    # VALIDAR HONDURAS
+    # VALIDAR QUE ESTÉ EN HONDURAS
     # -----------------------------------------------------
 
     if not (
@@ -324,7 +389,7 @@ if (
     else:
 
         # -------------------------------------------------
-        # BUSCAR ESTACIONES
+        # BOTÓN DE BÚSQUEDA
         # -------------------------------------------------
 
         if st.button(
@@ -344,6 +409,11 @@ if (
                         longitud
                     )
 
+
+                # -----------------------------------------
+                # SIN RESULTADOS
+                # -----------------------------------------
+
                 if len(estaciones) == 0:
 
                     st.warning(
@@ -353,6 +423,7 @@ if (
 
                 else:
 
+                    # Solo necesitamos las 3 más cercanas
                     tres_mas_cercanas = estaciones[:3]
 
                     st.success(
@@ -365,9 +436,9 @@ if (
                     )
 
 
-                    # -----------------------------------------
-                    # RESULTADOS
-                    # -----------------------------------------
+                    # -------------------------------------
+                    # MOSTRAR RESULTADOS
+                    # -------------------------------------
 
                     for posicion, estacion in enumerate(
                         tres_mas_cercanas,
@@ -387,8 +458,10 @@ if (
                                 </span>
 
                                 <div class="distancia">
+
                                     📏 Distancia aproximada:
                                     {estacion['distancia']:.2f} km
+
                                 </div>
 
                                 <div class="coordenadas">
@@ -409,9 +482,9 @@ if (
                         )
 
 
-                    # -----------------------------------------
+                    # -------------------------------------
                     # MAPA
-                    # -----------------------------------------
+                    # -------------------------------------
 
                     st.subheader(
                         "🗺️ Ubicación en el mapa"
@@ -448,7 +521,11 @@ if (
                     )
 
 
-            except requests.exceptions.RequestException as error:
+            # -------------------------------------------------
+            # ERROR
+            # -------------------------------------------------
+
+            except Exception as error:
 
                 st.error(
                     "❌ No fue posible consultar las estaciones "
@@ -465,15 +542,23 @@ if (
                 )
 
 
+# ---------------------------------------------------------
+# TODAVÍA NO HAY UBICACIÓN
+# ---------------------------------------------------------
+
 else:
 
     st.markdown(
         """
         <div class="aviso">
+
             📍 Primero debe permitir que el navegador obtenga
             la ubicación del dispositivo.
+
             <br><br>
+
             En celular, asegúrese de tener activado el GPS.
+
         </div>
         """,
         unsafe_allow_html=True
