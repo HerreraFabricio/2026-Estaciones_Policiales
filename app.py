@@ -21,100 +21,97 @@ st.set_page_config(
 # ESTILOS
 # ---------------------------------------------------------
 
-st.markdown(
-    """
-    <style>
+st.markdown("""
+<style>
 
-    .stApp {
-        background-color: #f5f7fa;
-    }
+.stApp {
+    background-color: #f5f7fa;
+}
 
-    .block-container {
-        max-width: 1100px;
-        padding-top: 2rem;
-        padding-bottom: 3rem;
-    }
+.block-container {
+    max-width: 1100px;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
 
-    .titulo {
-        font-size: 40px;
-        font-weight: 800;
-        color: #17365d;
-        margin-bottom: 5px;
-    }
+.titulo {
+    font-size: 40px;
+    font-weight: 800;
+    color: #17365d;
+    margin-bottom: 5px;
+}
 
-    .subtitulo {
-        font-size: 16px;
-        color: #687789;
-        margin-bottom: 28px;
-    }
+.subtitulo {
+    font-size: 16px;
+    color: #687789;
+    margin-bottom: 28px;
+}
 
-    .tarjeta {
-        background-color: white;
-        border: 1px solid #dde4ec;
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
+.tarjeta {
+    background-color: white;
+    border: 1px solid #dde4ec;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
 
-    .numero {
-        display: inline-block;
-        background-color: #17365d;
-        color: white;
-        border-radius: 8px;
-        padding: 5px 10px;
-        font-weight: bold;
-        margin-right: 8px;
-    }
+.numero {
+    display: inline-block;
+    background-color: #17365d;
+    color: white;
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-weight: bold;
+    margin-right: 8px;
+}
 
-    .nombre {
-        font-size: 20px;
-        font-weight: 700;
-        color: #17365d;
-    }
+.nombre {
+    font-size: 20px;
+    font-weight: 700;
+    color: #17365d;
+}
 
-    .distancia {
-        font-size: 18px;
-        font-weight: 700;
-        color: #168052;
-        margin-top: 10px;
-    }
+.distancia {
+    font-size: 18px;
+    font-weight: 700;
+    color: #168052;
+    margin-top: 10px;
+}
 
-    .coordenadas {
-        font-size: 13px;
-        color: #6b7683;
-        margin-top: 5px;
-    }
+.coordenadas {
+    font-size: 13px;
+    color: #6b7683;
+    margin-top: 5px;
+}
 
-    .ubicacion {
-        background-color: #edf4ff;
-        border-left: 5px solid #2769b5;
-        border-radius: 8px;
-        padding: 14px;
-        margin-bottom: 22px;
-        color: #37516e;
-    }
+.ubicacion {
+    background-color: #edf4ff;
+    border-left: 5px solid #2769b5;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 22px;
+    color: #37516e;
+}
 
-    .aviso {
-        background-color: #fff8e8;
-        border: 1px solid #eadfbd;
-        border-radius: 10px;
-        padding: 14px;
-        margin-top: 15px;
-        color: #685b37;
-    }
+.aviso {
+    background-color: #fff8e8;
+    border: 1px solid #eadfbd;
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 15px;
+    color: #685b37;
+}
 
-    div.stButton > button {
-        width: 100%;
-        border-radius: 10px;
-        height: 45px;
-        font-weight: 700;
-    }
+div.stButton > button {
+    width: 100%;
+    border-radius: 10px;
+    height: 45px;
+    font-weight: 700;
+}
 
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+</style>
+""", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
@@ -279,24 +276,16 @@ def obtener_estaciones(latitud, longitud):
 # ENCABEZADO
 # ---------------------------------------------------------
 
-st.markdown(
-    """
-    <div class="titulo">
-        🚓 Estaciones Policiales Más Cercanas
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="titulo">🚓 Estaciones Policiales Más Cercanas</div>
+""", unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <div class="subtitulo">
-        Utilice la ubicación de su dispositivo para encontrar
-        automáticamente las tres estaciones policiales más cercanas.
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("""
+<div class="subtitulo">
+Utilice la ubicación de su dispositivo para encontrar
+automáticamente las tres estaciones policiales más cercanas.
+</div>
+""", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
@@ -337,26 +326,15 @@ if (
         "accuracy"
     )
 
-    st.markdown(
-        f"""
-        <div class="ubicacion">
-
-            <strong>
-                ✅ Ubicación obtenida correctamente
-            </strong>
-
-            <br><br>
-
-            Latitud: {latitud:.6f}
-
-            <br>
-
-            Longitud: {longitud:.6f}
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+<div class="ubicacion">
+<strong>✅ Ubicación obtenida correctamente</strong>
+<br><br>
+Latitud: {latitud:.6f}
+<br>
+Longitud: {longitud:.6f}
+</div>
+""", unsafe_allow_html=True)
 
 
     # -----------------------------------------------------
@@ -445,41 +423,14 @@ if (
                         start=1
                     ):
 
-                        st.markdown(
-                            f"""
-                            <div class="tarjeta">
-
-                                <span class="numero">
-                                    {posicion}
-                                </span>
-
-                                <span class="nombre">
-                                    {estacion['nombre']}
-                                </span>
-
-                                <div class="distancia">
-
-                                    📏 Distancia aproximada:
-                                    {estacion['distancia']:.2f} km
-
-                                </div>
-
-                                <div class="coordenadas">
-
-                                    📍 Latitud:
-                                    {estacion['latitud']:.6f}
-
-                                    &nbsp;&nbsp; | &nbsp;&nbsp;
-
-                                    Longitud:
-                                    {estacion['longitud']:.6f}
-
-                                </div>
-
-                            </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                        st.markdown(f"""
+<div class="tarjeta">
+<span class="numero">{posicion}</span>
+<span class="nombre">{estacion['nombre']}</span>
+<div class="distancia">📏 Distancia aproximada: {estacion['distancia']:.2f} km</div>
+<div class="coordenadas">📍 Latitud: {estacion['latitud']:.6f} &nbsp;&nbsp;|&nbsp;&nbsp; Longitud: {estacion['longitud']:.6f}</div>
+</div>
+""", unsafe_allow_html=True)
 
 
                     # -------------------------------------
@@ -548,21 +499,14 @@ if (
 
 else:
 
-    st.markdown(
-        """
-        <div class="aviso">
-
-            📍 Primero debe permitir que el navegador obtenga
-            la ubicación del dispositivo.
-
-            <br><br>
-
-            En celular, asegúrese de tener activado el GPS.
-
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("""
+<div class="aviso">
+📍 Primero debe permitir que el navegador obtenga
+la ubicación del dispositivo.
+<br><br>
+En celular, asegúrese de tener activado el GPS.
+</div>
+""", unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------
